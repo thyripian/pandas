@@ -744,3 +744,20 @@ def test_to_csv_iterative_compression_buffer(compression):
             pd.read_csv(buffer, compression=compression, index_col=0), df
         )
         assert not buffer.closed
+
+def test_to_csv_with_comments():
+    # GH#59839
+    df = DataFrame({"col1": [1,2], "col2": [3,4]})
+    expected = """\
+col1,col2
+# This is a comment,
+1,3
+2,4
+"""
+    comments = ["This is a comment"]
+    with tm.ensure_clean("test_with_comments.csv") as path:
+        df.to_csv(path, comment=comments, index=False)
+        with open(path, encoding="utf-8") as f:
+            result = f.read()
+            print('\n',result,'\n')
+            assert result == expected

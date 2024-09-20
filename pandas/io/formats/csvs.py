@@ -75,6 +75,8 @@ class CSVFormatter:
         doublequote: bool = True,
         escapechar: str | None = None,
         storage_options: StorageOptions | None = None,
+        comment: Sequence[str] | None = None, # GH#59839
+        commentchar: str = '#', # GH#59839
     ) -> None:
         self.fmt = formatter
 
@@ -85,6 +87,8 @@ class CSVFormatter:
         self.compression: CompressionOptions = compression
         self.mode = mode
         self.storage_options = storage_options
+        self.comment = comment # GH#59839
+        self.commentchar = commentchar # GH#59839
 
         self.sep = sep
         self.index_label = self._initialize_index_label(index_label)
@@ -272,6 +276,9 @@ class CSVFormatter:
     def _save(self) -> None:
         if self._need_to_save_header:
             self._save_header()
+        # GH#59839
+        if self.comment:
+            self._save_comments()
         self._save_body()
 
     def _save_header(self) -> None:
@@ -332,3 +339,10 @@ class CSVFormatter:
             self.cols,
             self.writer,
         )
+
+    # GH#59839
+    def _save_comments(self) -> None:
+        num_columns = len(self.encoded_labels)
+        for comment_line in self.comment:
+            row = [f"{self.commentchar} {comment_line}"] + [""] * (num_columns - 1)
+            self.writer.writerow(row)
