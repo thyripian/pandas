@@ -3674,6 +3674,8 @@ class NDFrame(PandasObject, indexing.IndexingMixin):
         decimal: str = ...,
         errors: OpenFileErrors = ...,
         storage_options: StorageOptions = ...,
+        comment: Sequence[str] | None = ...,
+        commentchar: str = ...,
     ) -> str: ...
 
     @overload
@@ -3701,6 +3703,8 @@ class NDFrame(PandasObject, indexing.IndexingMixin):
         decimal: str = ...,
         errors: OpenFileErrors = ...,
         storage_options: StorageOptions = ...,
+        comment: Sequence[str] | None = ..., # GH#59839
+        commentchar: str = ..., # GH#59839
     ) -> None: ...
 
     @final
@@ -3732,6 +3736,8 @@ class NDFrame(PandasObject, indexing.IndexingMixin):
         decimal: str = ".",
         errors: OpenFileErrors = "strict",
         storage_options: StorageOptions | None = None,
+        comment: Sequence[str] | None = None, # GH#59839
+        commentchar: str = '#', # GH#59839
     ) -> str | None:
         r"""
         Write object to a comma-separated values (csv) file.
@@ -3819,6 +3825,14 @@ class NDFrame(PandasObject, indexing.IndexingMixin):
 
         {storage_options}
 
+        -------
+        # GH#59839
+        comment : list-like of str, optional
+            Lines to be inserted as comments between the header and the data.
+        comment_char : str, default '#'
+            Character used to prefix each comment line.
+        -------
+
         Returns
         -------
         None or str
@@ -3891,6 +3905,8 @@ class NDFrame(PandasObject, indexing.IndexingMixin):
             doublequote=doublequote,
             escapechar=escapechar,
             storage_options=storage_options,
+            comment=comment, # GH#59839
+            commentchar=commentchar # GH#59839
         )
 
     # ----------------------------------------------------------------------
@@ -8201,7 +8217,7 @@ class NDFrame(PandasObject, indexing.IndexingMixin):
                 return self._clip_with_scalar(None, threshold, inplace=inplace)
             return self._clip_with_scalar(threshold, None, inplace=inplace)
 
-        # GH #15390
+        # GH#15390
         # In order for where method to work, the threshold must
         # be transformed to NDFrame from other array like structure.
         if (not isinstance(threshold, ABCSeries)) and is_list_like(threshold):

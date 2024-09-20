@@ -963,6 +963,8 @@ class DataFrameRenderer:
         escapechar: str | None = None,
         errors: str = "strict",
         storage_options: StorageOptions | None = None,
+        comment: Sequence[str] | None = None, # GH#59839
+        commentchar: str = '#', # GH#59839
     ) -> str | None:
         """
         Render dataframe as comma-separated file.
@@ -992,6 +994,8 @@ class DataFrameRenderer:
             doublequote=doublequote,
             escapechar=escapechar,
             storage_options=storage_options,
+            comment=comment, # GH#59839
+            commentchar=commentchar, # GH#59839
             formatter=self.fmt,
         )
         csv_formatter.save()
